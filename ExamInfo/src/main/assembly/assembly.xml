@@ -1,0 +1,64 @@
+<assembly>
+    <id>distribution</id>
+    <formats>
+        <format>zip</format>
+    </formats>
+    <includeBaseDirectory>true</includeBaseDirectory>
+
+    <fileSets>
+        <!-- 包含根目录下的配置文件 -->
+        <fileSet>
+            <directory>${project.basedir}/conf</directory>
+            <outputDirectory>/conf</outputDirectory>
+            <excludes>
+                <exclude>**/*</exclude>
+            </excludes>
+    </fileSet>
+    <fileSet>
+        <directory>${project.basedir}/data</directory>
+        <outputDirectory>/data</outputDirectory>
+        <excludes>
+            <exclude>**/*</exclude>
+        </excludes>
+    </fileSet>
+    <fileSet>
+        <directory>${project.basedir}/log</directory>
+        <outputDirectory>/log</outputDirectory>
+        <excludes>
+            <exclude>**/*</exclude>
+        </excludes>
+    </fileSet>
+
+    <!-- 包含主类 JAR和启动脚本 文件 -->
+        <fileSet>
+            <directory>${project.build.directory}</directory>
+            <includes>
+                <include>ExamInfo*.jar</include>
+                <include>ExamInfo*.bat</include>
+            </includes>
+            <outputDirectory>/</outputDirectory>
+        </fileSet>
+
+        <!-- 包含 Java 16 环境 -->
+        <fileSet>
+            <directory>${project.basedir}/jre16</directory>
+            <outputDirectory>/jre16</outputDirectory>
+        </fileSet>
+
+        <!-- 包含自定义证书库 -->
+        <fileSet>
+            <directory>${project.basedir}/cert</directory>
+            <outputDirectory>/cert</outputDirectory>
+        </fileSet>
+    </fileSets>
+
+    <dependencySets>
+        <!-- 将依赖集中放到 lib 文件夹 -->
+        <dependencySet>
+            <outputDirectory>/lib</outputDirectory>
+            <useProjectArtifact>false</useProjectArtifact>
+            <unpack>false</unpack>
+            <scope>runtime</scope>
+        </dependencySet>
+    </dependencySets>
+</assembly>

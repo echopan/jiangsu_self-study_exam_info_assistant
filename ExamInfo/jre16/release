@@ -1,0 +1,2 @@
+JAVA_VERSION="16.0.2"
+MODULES="java.base java.datatransfer java.xml java.prefs java.desktop java.logging java.security.sasl java.naming java.security.jgss java.smartcardio java.xml.crypto jdk.crypto.ec jdk.crypto.cryptoki jdk.crypto.mscapi jdk.security.auth jdk.unsupported"

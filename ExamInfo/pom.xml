@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>groupId</groupId>
+    <artifactId>ExamInfo</artifactId>
+    <version>1.0-beta</version>
+
+    <properties>
+        <project.version>${project.version}</project.version>
+        <maven.compiler.source>16</maven.compiler.source>
+        <maven.compiler.target>16</maven.compiler.target>
+        <!-- 文件拷贝时的编码 -->
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <!-- 编译时的编码 -->
+        <maven.compiler.encoding>UTF-8</maven.compiler.encoding>
+    </properties>
+
+    <dependencies>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <excludes>
+                        <exclude>com/echo/examinfo/Encrypt4RSA.java</exclude>
+                        <exclude>com/echo/examinfo/ImageAnalysis.java</exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-antrun-plugin</artifactId>
+                <version>3.0.0</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>run</goal>
+                        </goals>
+                        <configuration>
+                            <target>
+                                <copy file="${basedir}\template\start_template.bat"
+                                      tofile="${project.build.directory}\ExamInfo_start.bat" overwrite="true"/>
+                            </target>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-resources-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>copy-resources</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}</outputDirectory>
+                            <resources>
+                                <resource>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>ExamInfo_start.bat</include>
+                                    </includes>
+                                    <filtering>true</filtering> <!-- 启用变量替换 -->
+                                    <targetPath>${project.build.directory}</targetPath>
+                                </resource>
+                            </resources>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.4.2</version>
+                <configuration>
+                    <archive>
+                        <manifest>
+                            <mainClass>com.echo.examinfo.ExamInfo</mainClass> <!-- 替换为你的主类 -->
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                        </manifest>
+                        <manifestEntries>
+                            <Implementation-Title>${project.name}</Implementation-Title>
+                            <Implementation-Version>${project.version}</Implementation-Version>
+                        </manifestEntries>
+                    </archive>
+
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <version>3.2.0</version>
+                <executions>
+                    <execution>
+                        <id>copy-dependencies</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>copy-dependencies</goal>
+                        </goals>
+                        <configuration>
+                            <outputDirectory>${project.build.directory}/lib</outputDirectory>
+                            <overWriteReleases>false</overWriteReleases>
+                            <overWriteSnapshots>false</overWriteSnapshots>
+                            <overWriteIfNewer>true</overWriteIfNewer>
+                            <includeScope>runtime</includeScope>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.6.0</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <minimizeJar>true</minimizeJar>
+                            <createDependencyReducedPom>true</createDependencyReducedPom>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-assembly-plugin</artifactId>
+                <version>3.7.1</version>
+                <configuration>
+                    <descriptors>
+                        <descriptor>src/main/assembly/assembly.xml</descriptor>
+                    </descriptors>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>make-assembly</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>single</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>ide-only</id>
+            <!--<activation>-->
+            <!--    <activeByDefault>true</activeByDefault>-->
+            <!--</activation>-->
+            <dependencies>
+                <dependency>
+                    <groupId>net.sourceforge.tess4j</groupId>
+                    <artifactId>tess4j</artifactId>
+                    <version>5.4.0</version>
+                    <scope>provided</scope>
+                </dependency>
+                <!-- 添加 Logback 作为日志实现 -->
+                <dependency>
+                    <groupId>ch.qos.logback</groupId>
+                    <artifactId>logback-classic</artifactId>
+                    <version>1.2.6</version> <!-- 请根据需要选择适当的版本 -->
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.openjdk.nashorn</groupId>
+                    <artifactId>nashorn-core</artifactId>
+                    <version>15.4</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>org.seleniumhq.selenium</groupId>
+                    <artifactId>selenium-java</artifactId>
+                    <version>4.26.0</version>
+                    <scope>provided</scope>
+                </dependency>
+
+                <dependency>
+                    <groupId>com.eclipsesource.j2v8</groupId>
+                    <artifactId>j2v8_win32_x86_64</artifactId>
+                    <version>4.6.0</version>
+                    <scope>provided</scope>
+                </dependency>
+            </dependencies>
+        </profile>
+    </profiles>
+
+</project>
